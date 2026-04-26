@@ -1,0 +1,68 @@
+First, build an image from the supplied Dockerfile, and call the image "ansible-demo".
+This will create an Ubunut VM that has SSH installed and configured, and has a user
+created called "ansible" with a password of "password", and who is a member of the
+sudo user group.
+
+docker build -t ansible-demo .
+
+
+Next, create two docker containers that are based on this image. Map the listening
+ssh port of 22 to port 2221 and 2222 on the host machine running the containers.
+
+docker run -d -p 2221:22 --name server1 ansible-demo
+docker run -d -p 2222:22 --name server2 ansible-demo
+
+
+On the machine that you want to issue commands from, install the ansible
+package, as well as the sshpass package needed to use password authentication
+for this demo. In a real scenario you would likely use SSH key based authentication.
+
+sudo apt install ansible-core sshpass
+
+
+Create a file for the inventory of machines that will be controlled by ansbile.
+Save the below contents in a file called "inventory.ini"
+
+[web]
+server1 ansible_host=127.0.0.1 ansible_port=2221 ansible_user=ansible ansible_password=password
+server2 ansible_host=127.0.0.1 ansible_port=2222 ansible_user=ansible ansible_password=password
+
+
+Try to run a ping command against all hosts.
+
+ansible all -i inventory.ini -m ping
+
+
+Error about known hosts....connect once via ssh to each server:
+
+ssh ansible@localhost -p 2221
+ssh ansible@localhost -p 2222
+# password: password
+
+
+Now try ping command again, along with a few other commands:
+
+ansible all -i inventory.ini -m ping
+ansible all -i inventory.ini -a "hostname"
+ansible all -i inventory.ini -a "uptime"
+ansible all -i inventory.ini -m shell -a "ls -l /home"
+
+
+Instead of running ad-hoc commands, run the setup playbook which will
+install the nginx web server and start the service
+
+ansible-playbook -i inventory.ini setup.yml
+
+Error about not being able to elevate using sudo. Need to supply password:
+
+ansible-playbook -i inventory.ini setup.yml --ask-become-pass
+
+Run the installTools playbook to install some extra tools to help us validate
+that the nginx web server was installed correctly:
+
+ansible-playbook -i inventory.ini installTools.yml --ask-become-pass
+
+Run curl on localhost to verify web server. We haven't opened up ports yet,
+so can't connect from outside host at this point.
+
+ansible all -i inventory.ini -a "curl localhost"

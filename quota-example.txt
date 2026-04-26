@@ -1,0 +1,58 @@
+# Create a 200MB disk file
+dd if=/dev/zero of=/quota-demo.img bs=1M count=200
+
+# Format it
+mkfs.ext4 /quota-demo.img
+
+# Create mount point
+mkdir /mnt/quota-demo
+
+# Mount it with loop + quota enabled
+mount -o loop,usrquota,grpquota /quota-demo.img /mnt/quota-demo
+
+
+cat /etc/fstab
+cat /etc/mtab
+cat /proc/mounts
+mount | grep quota
+
+sudo apt install quota
+
+# create / user / group
+sudo quotacheck -cug /mnt/quota-demo
+
+sudo quotaon /mnt/quota-demo
+
+sudo chmod g+w,a+w quota-demo/
+
+sudo setquota -u bubba2 10240 15360 0 0 /mnt/quota-demo
+sudo edquota -u bubba2
+sudo edquota -t   #change to 2 minutes
+
+sudo repquota /mnt/quota-demo
+sudo quota -u bubba2
+
+# If nothing showing, may need to create a file
+sudo su - bubba2
+cd /mnt/quota-demo
+touch testfile
+exit
+
+sudo repquota /mnt/quota-demo
+sudo quota -u bubba2
+
+
+dd if=/dev/zero of=bigfile bs=1M count=7
+ls -lh
+cp bigfile bigfile2
+cp bigfile bigfile3
+
+ls -lh
+#note that 3rd file copies as much as it can
+rm bigfile3
+quota #see how long grace period is for
+echo "test" >> smallfile
+quota #wait for time to expire -- try again
+cp smallfile smallfile2
+
+

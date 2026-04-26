@@ -1,0 +1,77 @@
+First, build a new docker image with an image name of "puppet-node". This
+will be used to create the nodes that are being controlled by the puppet
+server. They are Ubuntu images, with base tools installed, as well as
+the puppet-agent package. A continous loop will also run on the image
+which will run the puppet agent command every 30 seconds.
+
+docker build -t puppet-node .
+
+
+Now that the image is created, start the docker compose. This will start
+three containers: one is the puppet server using a public image, the other
+two are the puppet nodes using the image created above.
+
+docker-compose up -d
+
+NOTE: You can view the logs either through Docker Desktop if you have that
+instaled, or via command:
+
+docker container logs puppet-node1-1
+
+(Where "puppet-node1-1" is the container name). When the container first starts,
+you will likely see errors at first. This is because the puppet server isn't fully
+up and running yet. But when the script checks again in 30 seconds, it should
+work eventually.
+
+
+In one terminal, connect to one of the puppet nodes:
+
+docker exec -it puppet-node2-1 bash
+
+Run "ps aux" and verify that "nginx" is not running. Next, in another terminal, 
+connect to the puppet server, using the following:
+
+docker exec -it puppet-puppet-1 bash
+
+Once you are connected to the server, create a new file in the following location:
+/etc/puppetlabs/code/environments/production/manifests
+Filename: site.pp
+
+NOTE: You likely will need to install a tool such as nano:
+apt update
+apt install nano
+
+Contents of file:
+
+node default {
+  package { 'nginx':
+    ensure => installed,
+  }
+
+  package { 'squid':
+    ensure => absent,
+  }
+
+  service { 'nginx':
+    ensure => running,
+    enable => true,
+  }
+}
+
+
+Once the file is saved, it will get applied the next time the puppet nodes run
+the puppet agent process (every 30 seconds). Switch back to the terminal that
+is connected to one of the nodes, and check if nginx process is showing.
+
+Validate with curl as well:
+apt install curl
+curl http://localhost
+
+Next, install "squid" and verify installed:
+apt install squid
+whereis squid
+
+Wait 30 seconds, and check if squid was removed. (Note the configurations will
+still be there)
+
+

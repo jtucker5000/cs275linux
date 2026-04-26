@@ -1,0 +1,13 @@
+- name: Install libraries
+  hosts: web
+  become: true
+
+  tasks:
+    - name: Install curl
+      apt:
+        name: curl
+        update_cache: yes
+    - name: Install iproute2
+      apt:
+        name: iproute2
+        update_cache: yes
