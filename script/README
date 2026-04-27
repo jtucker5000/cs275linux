@@ -1,0 +1,82 @@
+The file notascript.txt needs to be transformed to become
+a valid script. Perform the following transformations:
+- Replace any "ZZZ" with "1"
+- Sort the results
+- Split each line into two columns (tab as delimiter) and keep only the 2nd column
+- Save the final results as a new file testscript.sh
+- Make the script executable and run it
+
+
+
+
+After running the script, it updated the timestamp one of the files within the "script"
+folder (and subfolder). Use the find command to find any files that have been modified
+in the last five minutes - assuming you ran the script within the last 5 minutes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Answers below -- scroll down to see.....
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sed 's/ZZZ/1/g' input.txt | sort | cut -f2
+
+
+find . -type f -mmin -5
