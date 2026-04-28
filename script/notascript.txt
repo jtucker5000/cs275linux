@@ -1,12 +1,12 @@
-ZZZ2  echo "all done!"
-08  x=$((x - 1))
-ZZZ1  cd ..
-03  c=1
-04  c=$((c + 1))
-0ZZZ  #!/bin/bash
-05  cd "f${c}"
-02  echo "Starting script...."
-06  cd "sf${c}"
-09  touch "s00${x}.txt"
-ZZZ0  cd ..
-07  x=$((c * 62))
+ZZZ2	echo "all done!"
+08	x=$((x - 1))
+ZZZ1	cd ..
+03	c=1
+04	c=$((c + 1))
+0ZZZ	#!/bin/bash
+05	cd "f${c}"
+02	echo "Starting script...."
+06	cd "sf${c}"
+09	touch "s00${x}.txt"
+ZZZ0	cd ..
+07	x=$((c * 62))
